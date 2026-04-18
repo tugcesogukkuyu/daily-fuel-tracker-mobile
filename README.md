@@ -1,7 +1,9 @@
 # Daily Fuel Tracker Mobile
 
-Flutter tabanlı mobil istemci.  
-Uygulama, ayrı bir Node.js/Express backend API ve PostgreSQL veritabanı ile çalışır.
+A Flutter-based mobile application for tracking daily nutrition, exercise, and hydration with a backend-driven architecture.
+
+The application integrates with a Node.js + Express backend and PostgreSQL database to provide persistent, user-specific tracking across sessions.
+
 
 ## Project Structure
 
@@ -61,49 +63,59 @@ daily_fuel_tracker_mobile/
 ├── ios/
 ├── pubspec.yaml
 └── README.md
+```
 
+---
 
 ## Architecture
 
-The mobile client is organized into four primary layers:
+The mobile client is structured into four primary layers:
 
-- **UI Layer**: `screens/` and `widgets/`
+- **UI Layer**: `screens/`, `widgets/`
 - **State Layer**: `auth_store.dart`, `daily_tracker_store.dart`
 - **Service Layer**: API communication modules under `services/`
-- **Model Layer**: typed data mapping under `models/`
+- **Model Layer**: typed data structures under `models/`
 
-The app no longer relies on local mock data for the core user flows. Authentication, meals, exercises, water logs, blog content, and food data are integrated with the backend API.
+The application does not rely on local mock data for core flows. All major features are integrated with the backend API.
+
+---
 
 ## Runtime Model
 
-The mobile client communicates with the following backend domains:
+The mobile application communicates with the following backend domains:
 
 - `auth`
 - `foods`
 - `blogs`
 - `meals`
 - `exercises`
-- `exercise catalog search`
+- `exercise catalog`
 - `water`
 
-Application state is coordinated primarily through two stores:
+Application state is managed through two main stores:
 
-- `AuthStore`: session lifecycle and secure session restoration
-- `DailyTrackerStore`: date-based meal, exercise, and water state
+- **AuthStore** → handles authentication, session lifecycle, and secure restoration
+- **DailyTrackerStore** → manages date-based meals, exercises, and water data
+
+---
 
 ## Technologies
 
-| Technology | Purpose |
-|---|---|
-| Flutter | Mobile UI framework |
-| Dart | Application language |
-| http | REST client |
-| flutter_secure_storage | Secure token and session persistence |
-| intl | Localization and date formatting |
-| table_calendar | Calendar UI |
-| google_fonts | Typography |
-| Node.js + Express.js | Backend API |
-| PostgreSQL | Persistent storage |
+```text
+| Layer | Technology | Purpose |
+|---|---|---|
+| Mobile | Flutter | Cross-platform mobile UI framework |
+| Language | Dart | Application development language |
+| Networking | http | REST API communication |
+| Storage | flutter_secure_storage | Secure token & session persistence |
+| UI | table_calendar | Calendar-based date selection |
+| UI | google_fonts | Typography customization |
+| Utility | intl | Date formatting & localization |
+| Backend | Node.js + Express.js | REST API layer |
+| Database | PostgreSQL | Persistent data storage |
+```
+
+---
 
 ## Features
 
@@ -118,190 +130,344 @@ Application state is coordinated primarily through two stores:
 - blog list and blog detail views
 - backend-backed persistence across app restarts
 
-## Session Persistence
+---
 
-Session data is stored with `flutter_secure_storage`.
+## System Capabilities
 
-Stored keys:
+| Domain | Capability |
+|---|---|
+| Authentication | User registration, login, and secure session restoration |
+| Nutrition Tracking | Add, list, and delete daily meal records |
+| Exercise Tracking | Add, list, search, and delete daily exercise records |
+| Hydration Tracking | Update and persist daily water consumption |
+| Date-Based State | Filter meals, exercises, and water logs by selected date |
+| Content | Display blog list and blog detail views |
+| Persistence | Restore user-specific records from backend storage across app restarts |
+
+---
+
+## Session Management
+
+| Component | Responsibility |
+|---|---|
+| Storage | Secure persistence via `flutter_secure_storage` |
+| AuthStore | In-memory session state and lifecycle management |
+| Token | Bearer token used for authenticated API requests |
+
+### Stored Keys
 
 ```text
 auth_user_id
 auth_full_name
 auth_email
 auth_token
+```
 
-Startup flow:
+### Startup flow:
 
-App launch
-→ restore session from secure storage
-→ if session exists, open dashboard
-→ fetch meals / exercises / water for selected date
-→ render current user state
+```text
+App Launch
+→ Restore session from secure storage
+→ Validate session existence
+→ Initialize AuthStore
+→ Fetch user-specific data for selected date
+→ Render dashboard state
+```
 
-Data Persistence
-User-generated data is persisted in PostgreSQL through the backend API.
+---
 
-Persisted domains:
+## Data Persistence
 
-users
-meals
-exercises
-water logs
-As a result, when the same user logs in again, previously recorded data is retrieved from the backend and rendered back into the app.
+| Layer | Description |
+|---|---|
+| Backend API | Handles all CRUD operations |
+| Database | PostgreSQL stores user-specific records |
+| Scope | Data is persisted per user and per date |
 
-Backend Dependency
-This mobile repository depends on a separate backend project:
+### Persisted Domains
 
-daily_fuel_tracker_backend
-The API base URL is configured in:
+- users
+- meals
+- exercises
+- water_logs
 
-lib/core/constants/api_constants.dart
-Example development base URL:
+---
 
-http://localhost:3000/api
-Notes:
+## Backend Integration
 
-localhost works for iOS Simulator
-Android Emulator typically requires 10.0.2.2
-production builds should point to the deployed backend URL
+| Component | Value |
+|---|---|
+| Backend Project | `daily_fuel_tracker_backend` |
+| Base URL Config | `lib/core/constants/api_constants.dart` |
+| Development URL | `http://localhost:3000/api` |
 
-Getting Started
-Prerequisites
-Flutter SDK
-Xcode / iOS Simulator or Android Studio / Android Emulator
-running backend API
-running PostgreSQL database
-Install dependencies
+---
+
+### Environment Notes
+
+- iOS Simulator → `localhost` works
+- Android Emulator → use `10.0.2.2`
+- Production → must point to deployed backend URL
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Flutter SDK
+- iOS Simulator (Xcode) or Android Emulator (Android Studio)
+- Running backend API (`daily_fuel_tracker_backend`)
+- PostgreSQL database
+
+---
+
+### Installation
+
+```bash
 flutter pub get
-Start the backend
+```
+
+---
+
+### Backend Setup
+
+```bash
 cd ../daily_fuel_tracker_backend
+npm install
 npm run dev
-Run the mobile app
+```
+
+---
+
+### Run Application
+
+```bash
 flutter run
-API Integration
-Authentication
-POST /api/auth/register
-POST /api/auth/login
-Foods
-GET /api/foods
-Blogs
-GET /api/blogs
-GET /api/blogs/:slug
-Meals
-GET /api/meals?userId=...&date=...
-POST /api/meals
-DELETE /api/meals/:id
-Exercises
-GET /api/exercises?userId=...&date=...
-POST /api/exercises
-DELETE /api/exercises/:id
-GET /api/exercises/catalog/search?q=...
-Water
-GET /api/water?userId=...&date=...
-PUT /api/water
+```
+---
 
-State Flow
-Login Flow
+## API Integration
+
+### Authentication
+
+| Method | Endpoint |
+|---|---|
+| POST | /api/auth/register |
+| POST | /api/auth/login |
+
+---
+
+### Foods
+
+| Method | Endpoint |
+|---|---|
+| GET | /api/foods |
+
+---
+
+### Blogs
+
+| Method | Endpoint |
+|---|---|
+| GET | /api/blogs |
+| GET | /api/blogs/:slug |
+
+---
+
+### Meals
+
+| Method | Endpoint |
+|---|---|
+| GET | /api/meals?userId=...&date=... |
+| POST | /api/meals |
+| DELETE | /api/meals/:id |
+
+---
+
+### Exercises
+
+| Method | Endpoint |
+|---|---|
+| GET | /api/exercises?userId=...&date=... |
+| POST | /api/exercises |
+| DELETE | /api/exercises/:id |
+| GET | /api/exercises/catalog/search?q=... |
+
+---
+
+### Water
+
+| Method | Endpoint |
+|---|---|
+| GET | /api/water?userId=...&date=... |
+| PUT | /api/water |
+
+---
+
+## State Flow
+
+### Authentication Flow
+
+```text
 User submits credentials
-→ backend returns user + token
-→ session is written to secure storage
+→ Backend validates request
+→ Backend returns authenticated user and access token
+→ Session data is written to secure storage
 → AuthStore updates in-memory session state
-→ DailyTrackerStore refreshes selected date data
-→ dashboard becomes the active screen
-Meal Flow
-Meal bottom sheet loads foods from backend
-→ user selects meal type
-→ user selects a food item
-→ meal record is posted to backend
-→ DailyTrackerStore refreshes selected date data
-→ dashboard and meal detail views reflect the updated state
-Exercise Flow
+→ DailyTrackerStore refreshes selected-date data
+→ Dashboard becomes active
+```
+
+### Meal Flow
+
+```text
+Meal entry UI requests food data from backend
+→ User selects meal type and food item
+→ Meal record is submitted to backend
+→ Backend persists meal record
+→ DailyTrackerStore refreshes selected-date meals
+→ Dashboard and meal detail views render updated state
+```
+
+### Exercise Flow
+
+```text
 User searches exercise catalog
-→ backend returns normalized exercise results
-→ user selects exercise + duration
-→ exercise record is posted to backend
-→ DailyTrackerStore refreshes selected date data
-→ dashboard and exercise detail views reflect the updated state
-Water Flow
-User increments or decrements water amount
-→ updated value is sent to backend
-→ water log is persisted
-→ DailyTrackerStore updates local state
-→ dashboard water card reflects the latest value
+→ Backend returns normalized exercise results
+→ User selects exercise and duration
+→ Exercise record is submitted to backend
+→ Backend persists exercise record
+→ DailyTrackerStore refreshes selected-date exercises
+→ Dashboard and exercise detail views render updated state
+```
 
-Screen Responsibilities
-Screen	Responsibility
-Login	user authentication
-Register	account creation
-Dashboard	summary metrics and current-day overview
-Meals	date-based meal records, add / delete
-Exercises	date-based exercise records, add / delete
-Water	daily hydration tracking
-Blog	content list and detail rendering
-Profile	account-related actions
+### Water Flow
 
-Development Notes
-AuthStore owns session state and secure restoration
-DailyTrackerStore owns daily meals, exercises, and water state
-food selection is backend-backed
-exercise search uses the backend catalog endpoint instead of a hardcoded static list
-meals, exercises, and water are fetched per user and per selected date
-the mobile client and backend are separated into different repositories
-Tested Flows
-user registration
-user login
-session restoration after app restart
-meal add / delete
-exercise add / delete
-water increment / decrement
-date switching
-blog open / detail view
-backend-backed data reload
-Troubleshooting
-API connection refused
-Check that the backend is running and the base URL is correct.
+```text
+User increments or decrements daily water amount
+→ Updated value is sent to backend
+→ Backend persists water log
+→ DailyTrackerStore updates hydration state
+→ Dashboard water card renders latest value
+```
 
-lib/core/constants/api_constants.dart
-Session is not restored
+---
+
+## Screen Responsibilities
+
+| Screen | Responsibility |
+|---|---|
+| Login | Handles user authentication |
+| Register | Handles user registration |
+| Dashboard | Displays daily summary metrics and selected-date overview |
+| Meals | Manages date-based meal records (add / delete) |
+| Exercises | Manages date-based exercise records (add / delete / search) |
+| Water | Manages daily hydration tracking |
+| Blog | Displays blog list and blog detail content |
+| Profile | Handles user-related actions and session context |
+
+---
+
+## Development Notes
+
+- `AuthStore` owns authentication state and secure session restoration
+- `DailyTrackerStore` owns selected-date meals, exercises, and water state
+- food selection is backend-backed rather than mock-driven
+- exercise search is powered by the backend catalog endpoint
+- meals, exercises, and water records are fetched per user and per selected date
+- the mobile client and backend are maintained as separate repositories
+- core user flows are integrated with persistent backend storage
+
+---
+
+## Tested Flows
+
+| Flow | Status |
+|---|---|
+| User registration | Implemented |
+| User login | Implemented |
+| Session restoration after app restart | Implemented |
+| Meal add / delete | Implemented |
+| Exercise add / delete | Implemented |
+| Water increment / decrement | Implemented |
+| Date switching | Implemented |
+| Blog list / detail view | Implemented |
+| Backend-backed data reload | Implemented |
+
+---
+
+## Troubleshooting
+
+### API connection refused
+
+Ensure the backend service is running and the base URL is correctly configured:
+
+`lib/core/constants/api_constants.dart`
+
+---
+
+### Session not restored
+
 Verify that:
 
-main.dart
-restores the session before app startup and that secure storage writes are completed after login.
+- session restoration is triggered before app initialization
+- secure storage write operations complete successfully after login
 
-iOS build issues
-Run:
+---
 
+### iOS build issues
+
+```bash
 flutter clean
 flutter pub get
 flutter run
+```
+
 If needed:
 
+```bash
 cd ios
 pod install
 cd ..
 flutter run
-Data exists in backend but is not visible in the app
-Verify:
+```
 
-the same user account is being used
-the selected date matches the record date
-DailyTrackerStore.refreshForSelectedDate() is called after state-changing operations
+---
 
-Current Status
-Core application development is complete.
+### Data exists in backend but not visible in app
 
-Completed areas:
+Verify that:
 
-Flutter UI layer
-backend integration
-persistent PostgreSQL-backed records
-secure session persistence
-meals / exercises / water flows
-blog module
-date-based state management
-Remaining work is mainly polish and release preparation:
+- the same user account is used
+- the selected date matches the stored record date
+- `DailyTrackerStore.refreshForSelectedDate()` is triggered after state updates
 
-production deployment
-app icon / branding updates
-release configuration
-final UX polish
+---
+
+## Current Status
+
+| Area | Status |
+|---|---|
+| Flutter UI layer | Completed |
+| Backend integration | Completed |
+| PostgreSQL data persistence | Completed |
+| Secure session management | Completed |
+| Meals / exercises / water flows | Completed |
+| Blog module | Completed |
+| Date-based state management | Completed |
+
+---
+
+### Remaining Work
+
+- production deployment
+- app icon and branding updates
+- release configuration
+- final UX polish
+
+---
+
+## License
+
+MIT
