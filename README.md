@@ -117,6 +117,12 @@ Application state is managed through two main stores:
 
 ---
 
+## Flutter Version
+
+Flutter 3.41.6
+
+---
+
 ## Features
 
 - email/password registration
