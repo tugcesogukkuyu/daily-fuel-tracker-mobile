@@ -468,6 +468,12 @@ Verify that:
 
 ---
 
+## Screenshots
+
+Screenshots are available in the `assets/screenshots/` directory.
+
+---
+
 ## License
 
 MIT
